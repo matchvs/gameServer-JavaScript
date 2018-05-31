@@ -86,6 +86,18 @@ class App {
     onJoinOver(request) {
         log.debug('onJoinOver:', request);
     }
+
+    /**
+     * 房间允许加人
+     * @param {Object} request 
+     * @param {number} request.gameID 游戏ID
+     * @param {string} request.roomID 房间ID
+     * @param {number} request.userID 用户ID
+     * @memberof App
+     */
+    onJoinOpen(request) {
+        log.debug('onJoinOpen:', request);
+    }
     
     /**
      * 玩家离开房间
@@ -164,6 +176,19 @@ class App {
         log.debug('onRoomDetail:', request);
     }
 
+     /**
+     * 修改房间自定义属性
+     * @param {Object} request 
+     * @param {number} request.gameID 游戏ID
+     * @param {string} request.roomID 房间ID
+     * @param {number} request.userID 用户ID
+     * @param {number} request.roomProperty 房间自定义属性
+     * @memberof App
+     */
+    onSetRoomProperty(request) {
+        log.debug('onSetRoomProperty:', request);
+    }
+
     examplePush(request) {
         let content = new textEncoding.TextDecoder("utf-8").decode(request.cpProto);
         let args = content.split('|');
@@ -176,10 +201,17 @@ class App {
                     roomID: request.roomID,
                 });
                 break;
+            case 'joinopen':
+                log.debug('examplePush msg:', cmd);
+                this.pushHander.joinOpen({
+                    gameID: request.gameID, 
+                    roomID: request.roomID,
+                });
+                break;
             case 'kickplayer':
                 let destID = args[1];
+                log.debug('examplePush msg:', cmd)
                 if (destID) {
-                    log.debug('examplePush msg:', cmd)
                     this.pushHander.kickPlayer({
                         roomID: request.roomID,
                         destID: destID,
@@ -193,6 +225,17 @@ class App {
                     roomID: request.roomID,
                 });
                 break;
+            case 'setRoomProperty':
+                let msg = args[1];
+                log.debug('examplePush msg:', cmd);
+                if (msg) {
+                    let roomProperty = new textEncoding.TextEncoder("utf-8").encode(msg);
+                    this.pushHander.setRoomProperty({
+                        gameID: request.gameID,
+                        roomID: request.roomID,
+                        roomProperty: roomProperty,
+                    });
+                }
             default:
                 this.pushHander.pushEvent({
                     gameID: request.gameID, 

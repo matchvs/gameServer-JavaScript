@@ -12,5 +12,15 @@
                 "level": "debug"
             }
         }
+    },
+    "register": {
+        "enable": false,
+        "gameID": 12345,
+        "svcName": "svc-abc",
+        "podName": "pod-abc",
+        "remoteHost": "192.168.8.201",
+        "remotePort": 9981,
+        "localHost": "192.168.8.143",
+        "localPort": 30054
     }
 }

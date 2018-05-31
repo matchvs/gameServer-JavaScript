@@ -17,7 +17,7 @@ function main() {
         log4js.configure(conf.log);
 
         let app = new App();
-        let gs = new GS(conf.addr, app);
+        let gs = new GS(conf.addr, app, conf.register);
         let pushHander = gs.start();
         app.setPushHander(pushHander);
         

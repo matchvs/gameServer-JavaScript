@@ -3,7 +3,7 @@
   "description": "game server demo written by node",
   "version": "0.1.0",
   "dependencies": {
-    "gameserver-nodejs": "^3.6.1",
+    "gameserver-nodejs": "3.7.7",
     "log4js": "^2.5.3"
   },
   "scripts": {
