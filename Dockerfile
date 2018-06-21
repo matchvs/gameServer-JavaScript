@@ -1,7 +1,6 @@
-FROM node
+FROM registry.matchvs.com/matchvs/matchvs_nodejs:latest
 WORKDIR /app
 COPY package.json /app
-RUN npm install -g cnpm --registry=https://registry.npm.taobao.org
 RUN cnpm install
 COPY . /app
 CMD node main.js
