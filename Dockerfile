@@ -1,4 +1,4 @@
-FROM registry.matchvs.com/matchvs/matchvs_nodejs:latest
+FROM registry.matchvs.com/language/nodejs:latest
 WORKDIR /app
 COPY package.json /app
 RUN cnpm install
