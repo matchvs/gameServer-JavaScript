@@ -17,3 +17,30 @@ Matchvs 提供了云端一键部署功能：开发者只需在完成调试后将
 Matchvs 基于原生的 Kubernetes 提供了容器管理服务。每个 gameServer 都对应一个容器，可以进行弹性伸缩。gameServer 支持不中断业务持续更新：在更新代码后，重启服务即可。每个用户的gameServer资源相互隔离，不会互相影响。
 
 更多使用详情请前往 Matchvs官网查看： http://www.matchvs.com/service?page=processgameServerJS
+
+## 框架介绍
+
+框架目录结构如下所示：
+
+```shell
+gameServer
+├── Dockerfile
+├── Makefile
+├── README.md
+├── conf
+│   └── config.json
+├── gsmeta
+├── main.js
+├── package.json
+└── src
+    └── app.js
+```
+
+* **Dokcerfile** 用于定制 Docker 镜像。Matchvs 使用 kubernetes 集群管理 gameServer，所以在 gameServer 发布上线时需要先打包成 Docker 镜像，然后才能顺利上线运行。框架提供了默认的 Dockerfile，开发者一般无需修改。
+* **Makefile** 发布 gameServer 时，Matchvs 在服务器上执行`make image`生成 Docker 镜像。
+* **README.md** 说明文档。
+* **conf** gameServer 配置目录。
+* **gsmeta** gameServer 元数据，记录当前 gameServer 框架的版本和语言等信息。
+* **main.js** 启动脚本。用于 gameServer 初始化，例如读取 conf 目录下的配置文件，启动 gameServer 底层 gRPC 服务，以及开发者自定义模块的初始化。
+* **package.json** 定义了 gameServer 所需要的各种模块，以及项目的配置信息（比如名称、版本、许可证等元数据）。
+* **src** 源文件目录，开发者应将自己的代码放在该目录下统一管理。
