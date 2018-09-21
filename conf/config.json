@@ -18,9 +18,16 @@
         "gameID": 12345,
         "svcName": "svc-abc",
         "podName": "pod-abc",
-        "remoteHost": "192.168.8.201",
+        "remoteHost": "192.168.8.1",
         "remotePort": 9981,
-        "localHost": "192.168.8.143",
+        "localHost": "192.168.8.2",
         "localPort": 30054
+    },
+    "roomConf": {
+        "enable": false,
+        "svcName": "svc-abc",
+        "podName": "pod-abc",
+        "remoteHost": "192.168.8.1",
+        "remotePort": 9982
     }
 }

@@ -39,7 +39,7 @@ class App {
      * @param {number} request.createExtInfo.mode 游戏模式
      * @param {number} request.createExtInfo.canWatch 是否可观战
      * @param {Uint8Array} request.createExtInfo.roomProperty 房间属性
-     * @param {number} request.createExtInfo.createFlag 房间创建途径：1系统创建房间、2玩家创建房间
+     * @param {number} request.createExtInfo.createFlag 房间创建途径：1 系统创建房间、2 玩家创建房间、3 gameServer创建房间
      * @param {string} request.createExtInfo.createTime 创建时间
      * @memberof App
      */
@@ -166,7 +166,7 @@ class App {
      * @param {number} request.roomDetail.canWatch 是否可观战
      * @param {Uint8Array} request.roomDetail.roomProperty 房间属性
      * @param {number} request.roomDetail.owner 房主
-     * @param {number} request.roomDetail.createFlag 房间创建途径：1系统创建房间、2玩家创建房间
+     * @param {number} request.roomDetail.createFlag 房间创建途径：1 系统创建房间、2 玩家创建房间、3 gameServer创建房间
      * @param {Object[]} request.roomDetail.playersList 房间用户列表
      * @param {number} request.roomDetail.playersList[].userID 用户ID
      * @param {Uint8Array} request.roomDetail.playersList[].userProfile 用户profile
@@ -176,7 +176,7 @@ class App {
         log.debug('onRoomDetail:', request);
     }
 
-     /**
+    /**
      * 修改房间自定义属性
      * @param {Object} request 
      * @param {number} request.gameID 游戏ID
@@ -189,20 +189,55 @@ class App {
         log.debug('onSetRoomProperty:', request);
     }
 
+    /**
+     * 设置帧率
+     * @param {Object} request
+     * @param {number} request.gameID
+     * @param {string} request.roomID
+     * @param {number} request.frameRate 帧率
+     * @param {number} request.frameIndex 初始帧编号
+     * @param {string} request.timestamp 时间戳
+     * @param {number} request.enableGS GameServer是否参与帧同步
+     * @memberof App
+     */
+    onSetFrameSyncRate(request) {
+        log.debug('onSetFrameSyncRate:', request);
+    }
+
+    /**
+     * 帧数据
+     * @param {Object} request
+     * @param {number} request.gameID
+     * @param {string} request.roomID
+     * @param {number} request.frameIndex 帧编号
+     * @param {Object[]} request.frameItems 元数据集合
+     * @param {number} request.frameItems[].srcUserID 发送用户ID
+     * @param {string} request.frameItems[].cpProto 自定义消息内容
+     * @param {string} request.frameItems[].timestamp 时间戳
+     * @param {number} request.frameWaitCount 等待的帧数
+     * @memberof App
+     */
+    onFrameUpdate(request) {
+        log.debug('onFrameUpdate:', request);
+    }
+
+    /**
+     * gameServer API 使用示例
+     * @param {Object} request 
+     */
     examplePush(request) {
         let content = new textEncoding.TextDecoder("utf-8").decode(request.cpProto);
         let args = content.split('|');
         let cmd = args[0];
+        log.debug('examplePush msg:', cmd);
         switch (cmd) {
             case 'joinover':
-                log.debug('examplePush msg:', cmd);
                 this.pushHander.joinOver({
                     gameID: request.gameID, 
                     roomID: request.roomID,
                 });
                 break;
             case 'joinopen':
-                log.debug('examplePush msg:', cmd);
                 this.pushHander.joinOpen({
                     gameID: request.gameID, 
                     roomID: request.roomID,
@@ -210,7 +245,6 @@ class App {
                 break;
             case 'kickplayer':
                 let destID = args[1];
-                log.debug('examplePush msg:', cmd)
                 if (destID) {
                     this.pushHander.kickPlayer({
                         roomID: request.roomID,
@@ -219,7 +253,6 @@ class App {
                 }
                 break;
             case 'roomDetail':
-                log.debug('examplePush msg:', cmd);
                 this.pushHander.getRoomDetail({
                     gameID: request.gameID, 
                     roomID: request.roomID,
@@ -227,7 +260,6 @@ class App {
                 break;
             case 'setRoomProperty':
                 let msg = args[1];
-                log.debug('examplePush msg:', cmd);
                 if (msg) {
                     let roomProperty = new textEncoding.TextEncoder("utf-8").encode(msg);
                     this.pushHander.setRoomProperty({
@@ -236,6 +268,68 @@ class App {
                         roomProperty: roomProperty,
                     });
                 }
+                break;
+            case 'createRoom':
+                let roomProperty = new textEncoding.TextEncoder("utf-8").encode('hello');
+                this.pushHander.createRoom({
+                    gameID: request.gameID,
+                    ttl: 600,
+                    roomInfo: {
+                        roomName: 'game server room',
+                        maxPlayer: 2,
+                        mode: 1,
+                        canWatch: 1,
+                        visibility: 1,
+                        roomProperty: roomProperty,
+                    },
+                }, function(err, response) {
+                    if (err) {
+                        log.warn(err);
+                    } else {
+                        log.debug('create room response:', response);
+                    }
+                });
+                break;
+            case 'touchRoom':
+                this.pushHander.touchRoom({
+                    gameID: request.gameID,
+                    roomID: args[1],
+                    ttl: args[2],
+                }, function(err, response) {
+                    if (err) {
+                        log.warn(err);
+                    } else {
+                        log.debug('change room ttl response:', response);
+                    }
+                });
+                break;
+            case 'destroyRoom':
+                this.pushHander.destroyRoom({
+                    gameID: request.gameID,
+                    roomID: args[1],
+                }, function(err, response) {
+                    if (err) {
+                        log.warn(err);
+                    } else {
+                        log.debug('destroy room response:', response);
+                    }
+                });
+                break;
+            case 'setFrameSyncRate':
+                this.pushHander.setFrameSyncRate({
+                    gameID: request.gameID,
+                    roomID: request.roomID,
+                    frameRate: args[1],
+                });
+                break;
+            case 'frameBroadcast':
+                this.pushHander.frameBroadcast({
+                    gameID: request.gameID,
+                    roomID: request.roomID,
+                    cpProto: args[1],
+                    operation: args[2],
+                });
+                break;
             default:
                 this.pushHander.pushEvent({
                     gameID: request.gameID, 
