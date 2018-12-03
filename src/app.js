@@ -37,7 +37,7 @@ class App {
      * @param {number} request.createExtInfo.state 房间状态：1开放、2关闭
      * @param {number} request.createExtInfo.maxPlayer 最大人数
      * @param {number} request.createExtInfo.mode 游戏模式
-     * @param {number} request.createExtInfo.canWatch 是否可观战
+     * @param {number} request.createExtInfo.canWatch 是否可观战：1 可以、2 不可以
      * @param {Uint8Array} request.createExtInfo.roomProperty 房间属性
      * @param {number} request.createExtInfo.createFlag 房间创建途径：1 系统创建房间、2 玩家创建房间、3 gameServer创建房间
      * @param {string} request.createExtInfo.createTime 创建时间
@@ -163,13 +163,26 @@ class App {
      * @param {number} request.roomDetail.state 房间状态：1开放、2关闭
      * @param {number} request.roomDetail.maxPlayer 房间最大人数
      * @param {number} request.roomDetail.mode 模式
-     * @param {number} request.roomDetail.canWatch 是否可观战
+     * @param {number} request.roomDetail.canWatch 是否可观战：1 可以、2 不可以
      * @param {Uint8Array} request.roomDetail.roomProperty 房间属性
      * @param {number} request.roomDetail.owner 房主
      * @param {number} request.roomDetail.createFlag 房间创建途径：1 系统创建房间、2 玩家创建房间、3 gameServer创建房间
      * @param {Object[]} request.roomDetail.playersList 房间用户列表
      * @param {number} request.roomDetail.playersList[].userID 用户ID
      * @param {Uint8Array} request.roomDetail.playersList[].userProfile 用户profile
+     * @param {Object} request.roomDetail.watchRoom 观战房间详情
+     * @param {Object} request.roomDetail.watchRoom.watchInfo 观战房间信息
+     * @param {string} request.roomDetail.watchRoom.watchInfo.roomID 房间ID
+     * @param {number} request.roomDetail.watchRoom.watchInfo.state 观战房间状态，1：回放房间；2：游戏中房间
+     * @param {Object} request.roomDetail.watchRoom.watchInfo.watchSetting 观战设置
+     * @param {number} request.roomDetail.watchRoom.watchInfo.watchSetting.maxWatch 最大观战人数
+     * @param {boolean} request.roomDetail.watchRoom.watchInfo.watchSetting.watchPersistent 观战是否持久化
+     * @param {number} request.roomDetail.watchRoom.watchInfo.watchSetting.watchDelayMs 观战延迟时间，单位为毫秒
+     * @param {number} request.roomDetail.watchRoom.watchInfo.watchSetting.cacheTime 缓存时间
+     * @param {number} request.roomDetail.watchRoom.watchInfo.curWatch 当前观战人数
+     * @param {Object[]} request.roomDetail.watchRoom.watchPlayersList 观战用户列表
+     * @param {number} request.roomDetail.watchRoom.watchPlayersList[].userID 用户ID
+     * @param {Uint8Array} request.roomDetail.watchRoom.watchPlayersList[].userProfile 用户profile
      * @memberof App
      */
     onRoomDetail(request) {
@@ -282,6 +295,12 @@ class App {
                         visibility: 1,
                         roomProperty: roomProperty,
                     },
+                    watchSetting: {
+                        maxWatch: 3,
+                        watchPersistent: false,
+                        watchDelayMs: 10*1000,
+                        cacheTime: 60*1000,
+                    },
                 }, function(err, response) {
                     if (err) {
                         log.warn(err);
@@ -334,7 +353,8 @@ class App {
                 this.pushHander.pushEvent({
                     gameID: request.gameID, 
                     roomID: request.roomID, 
-                    pushType: 3, 
+                    pushType: 1, 
+                    destsList: [request.userID], 
                     content: request.cpProto,
                 });
                 break;
