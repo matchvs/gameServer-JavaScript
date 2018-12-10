@@ -39,7 +39,7 @@ class App {
      * @param {number} request.createExtInfo.mode 游戏模式
      * @param {number} request.createExtInfo.canWatch 是否可观战：1 可以、2 不可以
      * @param {Uint8Array} request.createExtInfo.roomProperty 房间属性
-     * @param {number} request.createExtInfo.createFlag 房间创建途径：1 系统创建房间、2 玩家创建房间、3 gameServer创建房间
+     * @param {number} request.createExtInfo.createFlag 房间创建途径：1 系统创建房间、2 玩家创建房间、3 gameServer创建房间、4 组队房间
      * @param {string} request.createExtInfo.createTime 创建时间
      * @memberof App
      */
@@ -68,7 +68,7 @@ class App {
      * @param {number} request.joinExtInfo.userID 加入房间的玩家ID
      * @param {Uint8Array} request.joinExtInfo.userProfile 加入房间的玩家profile
      * @param {string} request.joinExtInfo.roomID 要加入的房间ID
-     * @param {number} request.joinExtInfo.joinType 加入类型：1指定roomID、2属性匹配、3随机匹配、4重新加入、5创建房间并随后自动加入房间
+     * @param {number} request.joinExtInfo.joinType 加入类型：1指定roomID、2属性匹配、3随机匹配、4重新加入、5创建房间并随后自动加入房间、6观战者切换为玩家、7小队成员加入
      * @memberof App
      */
     onJoinRoom(request) {
@@ -183,6 +183,19 @@ class App {
      * @param {Object[]} request.roomDetail.watchRoom.watchPlayersList 观战用户列表
      * @param {number} request.roomDetail.watchRoom.watchPlayersList[].userID 用户ID
      * @param {Uint8Array} request.roomDetail.watchRoom.watchPlayersList[].userProfile 用户profile
+     * @param {Object[]} request.roomDetail.brigadesList 大队列表
+     * @param {number} request.roomDetail.brigadesList[].brigadeID 大队ID
+     * @param {Object[]} request.roomDetail.brigadesList[].teamsList 小队列表
+     * @param {Object} request.roomDetail.brigadesList[].teamsList.teamInfo 小队信息
+     * @param {string} request.roomDetail.brigadesList[].teamsList.teamInfo.teamID 小队ID
+     * @param {string} request.roomDetail.brigadesList[].teamsList.teamInfo.password 小队密码
+     * @param {number} request.roomDetail.brigadesList[].teamsList.teamInfo.capacity 小队的容量
+     * @param {number} request.roomDetail.brigadesList[].teamsList.teamInfo.mode 游戏模式
+     * @param {number} request.roomDetail.brigadesList[].teamsList.teamInfo.visibility 小队的可见性：0 不可见、1 可见
+     * @param {number} request.roomDetail.brigadesList[].teamsList.teamInfo.owner 小队的队长
+     * @param {Object[]} request.roomDetail.brigadesList[].teamsList.playerList 小队的队员列表
+     * @param {number} request.roomDetail.brigadesList[].teamsList.playerList[].userID 小队队员的用户ID
+     * @param {Uint8Array} request.roomDetail.brigadesList[].teamsList.playerList[].userProfile 小队队员的用户profile
      * @memberof App
      */
     onRoomDetail(request) {
