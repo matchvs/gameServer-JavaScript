@@ -13,12 +13,27 @@ const CONFIG_PATH = path.resolve(__dirname, './conf/config.json');
 function main() {
     fs.readFile(CONFIG_PATH, function(err, data) {
         if (err) throw err;
+
+        // 解析配置文件
         let conf = JSON.parse(data);
         log4js.configure(conf.log);
 
+        // 创建 app
         let app = new App();
-        let gs = new GS(conf.addr, app, conf.register, conf.roomConf);
+
+        // 创建 gameserver 服务
+        let gs = new GS({
+            app: app,
+            addr: conf.addr,
+            regConf: conf.register,
+            roomConf: conf.roomConf,
+            metricConf: conf.metrics,
+        });
+
+        // 启动 gameserver 服务
         let pushHander = gs.start();
+
+        // 设置消息推送 handler
         app.setPushHander(pushHander);
         
         const log = log4js.getLogger();

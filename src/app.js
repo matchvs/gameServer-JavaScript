@@ -224,6 +224,7 @@ class App {
      * @param {number} request.frameIndex 初始帧编号
      * @param {string} request.timestamp 时间戳
      * @param {number} request.enableGS GameServer是否参与帧同步
+     * @param {number} request.cacheFrameMS 缓存帧的毫秒数(0为不开启缓存功能；-1为缓存所有数据)
      * @memberof App
      */
     onSetFrameSyncRate(request) {
@@ -348,11 +349,33 @@ class App {
                 });
                 break;
             case 'setFrameSyncRate':
-                this.pushHander.setFrameSyncRate({
-                    gameID: request.gameID,
-                    roomID: request.roomID,
-                    frameRate: args[1],
-                });
+                let frameRate = args[1];
+                let tmpCacheFrameMS = args[2];
+                if (frameRate && tmpCacheFrameMS) {
+                    this.pushHander.setFrameSyncRate({
+                        gameID: request.gameID,
+                        roomID: request.roomID,
+                        frameRate: frameRate,
+                        enableGS: 1,
+                        cacheFrameMS: tmpCacheFrameMS,
+                    });
+                }
+                else {
+                    log.warn('no cacheFrameMS');
+                }
+                break;
+            case 'getCacheData':
+                let cacheFrameMS = args[1];
+                if (cacheFrameMS) {
+                    this.pushHander.getCacheData({
+                        gameID: request.gameID,
+                        roomID: request.roomID,
+                        cacheFrameMS: cacheFrameMS,
+                    });
+                }
+                else {
+                    log.warn('no cacheFrameMS');
+                }
                 break;
             case 'frameBroadcast':
                 this.pushHander.frameBroadcast({
@@ -361,6 +384,22 @@ class App {
                     cpProto: args[1],
                     operation: args[2],
                 });
+                break;
+            case 'metric':
+                let name = args[1];
+                let value = args[2];
+                if (name && value) {
+                    this.pushHander.reportMetric([{
+                        name: name,
+                        value: parseInt(value),
+                    }], function(err, response) {
+                        if (err) {
+                            log.warn(err);
+                        } else {
+                            log.debug('set metric response:', response);
+                        }
+                    });
+                }
                 break;
             default:
                 this.pushHander.pushEvent({

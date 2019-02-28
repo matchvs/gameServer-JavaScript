@@ -29,5 +29,8 @@
         "podName": "pod-abc",
         "remoteHost": "192.168.8.1",
         "remotePort": 9982
+    },
+    "metrics": {
+        "enable": false
     }
 }
